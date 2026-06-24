@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Хабит Трекер - Все в одном</title>
+    <link rel="stylesheet" href="loginStyle.css"/>
+    <link rel="stylesheet" href="mainScreenStyle.css"/>
+    <link rel="stylesheet" href="progressStyle.css"/>
+
+    <!-- Для iOS -->
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="HabitTrack">
+</head>
+<body>
+
+<div class="phone-mockup">
+    <div class="phone-screen">
+        
+        <div class="header-bar">
+            <div class="header-circles">
+                <span class="circle-dot active" data-screen="0"></span>
+                <span class="circle-dot" data-screen="1"></span>
+                <span class="circle-dot" data-screen="2"></span>
+                <span class="circle-dot" data-screen="3"></span>
+            </div>
+        </div>
+
+        <div class="app-slider" id="appSlider">
+            
+            <!-- СТРАНИЦА 0: АВТОРИЗАЦИЯ -->
+            <div class="app-page-wrapper">
+                <div class="auth-container" id="authContainer">
+                    <div class="tabs">
+                        <button class="tab-btn active" id="tabLogin" onclick="switchMode('login')">Вход</button>
+                        <button class="tab-btn" id="tabRegister" onclick="switchMode('register')">Регистрация</button>
+                    </div>
+
+                    <form class="auth-form" id="authForm">
+                        <div class="form-group extra-field" id="nameGroup">
+                            <label>Введите ваше имя</label>
+                            <input type="text" id="name" class="input-field"/>
+                        </div>
+                        <div class="form-group">
+                            <label>Введите логин</label>
+                            <input type="text" id="login" class="input-field"/>
+                        </div>
+                        <div class="form-group">
+                            <label>Введите пароль</label>
+                            <input type="password" id="password" class="input-field"/>
+                        </div>
+                        <div class="form-group extra-field" id="confirmPasswordGroup">
+                            <label>Повторите пароль</label>
+                            <input type="password" id="confirmPassword" class="input-field"/>
+                        </div>
+                        
+                        <div class="action-container">
+                            <button type="submit" class="submit-btn" id="submitBtn">войти &rarr;</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- СТРАНИЦА 1: БОСС -->
+            <div class="app-page-wrapper">
+                <div class="boss-container" id="bossPage">
+                    <h1 class="boss-title">Здравствуйте, босс!</h1>
+                    <div class="meme-wrapper">
+                        <img src="мем кот.png" alt="Мем с котиком" class="meme-img"/>
+                    </div>
+                    <div class="action-container">
+                        <button type="button" class="submit-btn" id="goToMainBtn">дальше &rarr;</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- СТРАНИЦА 2: ГЛАВНАЯ -->
+            <div class="app-page-wrapper">
+                <div class="main-container">
+                    <div class="calendar-section">
+                        <div class="month-switcher">
+                            <button class="nav-arrow" id="prevMonthBtn">&larr;</button>
+                            <h2 class="month-title" id="monthTitle">ИЮНЬ</h2>
+                            <button class="nav-arrow" id="nextMonthBtn">&rarr;</button>
+                        </div>
+                        <div class="calendar-grid">
+                            <div class="weekday-label">пн</div>
+                            <div class="weekday-label">вт</div>
+                            <div class="weekday-label">ср</div>
+                            <div class="weekday-label">чт</div>
+                            <div class="weekday-label">пт</div>
+                            <div class="weekday-label">сб</div>
+                            <div class="weekday-label">вс</div>
+                            <div class="calendar-days-container" id="calendarDays"></div>
+                        </div>
+                    </div>
+
+                    <div class="goals-section">
+                        <div class="section-badge">ЦЕЛИ НА ДЕНЬ</div>
+                        <div class="habits-list" id="uncompletedHabitsList"></div>
+                        <div class="divider-line" id="habitsDivider"></div>
+                        <div class="habits-list" id="completedHabitsList"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- СТРАНИЦА 3: ПРОГРЕСС -->
+            <div class="app-page-wrapper">
+                <div class="progress-container">
+                    <h1 class="progress-title">Прогресс месяца</h1>
+                    <div class="progress-habits-list" id="progressHabitsList"></div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- КНОПКА ДОБАВЛЕНИЯ ПРИВЫЧКИ -->
+        <button class="add-habit-btn" id="openModalBtn">+</button>
+
+        <!-- МОДАЛЬНОЕ ОКНО -->
+        <div class="modal-overlay" id="habitModal">
+            <div class="modal-window">
+                <div class="modal-header">НОВАЯ ПРИВЫЧКА</div>
+                <form class="modal-form" id="habitForm">
+                    <div class="modal-group">
+                        <label>Название привычки</label>
+                        <input type="text" id="habitName" class="modal-input" required placeholder="Например: Зарядка"/>
+                    </div>
+                    <div class="modal-group">
+                        <label>Как часто выполнять?</label>
+                        <select id="habitFrequency" class="modal-input" onchange="toggleDaysSelection()">
+                            <option value="everyday">Каждый день</option>
+                            <option value="specific">Выбранные дни недели</option>
+                        </select>
+                    </div>
+                    <div class="modal-group days-checkboxes" id="daysCheckboxesGroup">
+                        <label>Дни недели:</label>
+                        <div class="days-row">
+                            <label><input type="checkbox" value="1"/> Пн</label>
+                            <label><input type="checkbox" value="2"/> Вт</label>
+                            <label><input type="checkbox" value="3"/> Ср</label>
+                            <label><input type="checkbox" value="4"/> Чт</label>
+                            <label><input type="checkbox" value="5"/> Пт</label>
+                            <label><input type="checkbox" value="6"/> Сб</label>
+                            <label><input type="checkbox" value="0"/> Вс</label>
+                        </div>
+                    </div>
+                    <div class="modal-group">
+                        <label>Цвет отметки:</label>
+                        <div class="color-palette">
+                            <label class="color-option" style="background-color: #5cc1e0;"><input type="radio" name="habitColor" value="#5cc1e0" checked/></label>
+                            <label class="color-option" style="background-color: #e38d76;"><input type="radio" name="habitColor" value="#e38d76"/></label>
+                            <label class="color-option" style="background-color: #f7b3ee;"><input type="radio" name="habitColor" value="#f7b3ee"/></label>
+                            <label class="color-option" style="background-color: #fce181;"><input type="radio" name="habitColor" value="#fce181"/></label>
+                            <label class="color-option" style="background-color: #9b7bf7;"><input type="radio" name="habitColor" value="#9b7bf7"/></label>
+                        </div>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" class="cancel-btn" id="closeModalBtn">Отмена</button>
+                        <button type="submit" class="save-btn">Сохранить</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script src="navigation.js"></script>
+<script src="script.js"></script>
+<script src="main.js"></script>
+<script src="progress.js"></script>
+<script>
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/sw.js')
+            .then(() => console.log('✅ Service Worker зарегистрирован'))
+            .catch(err => console.log('❌ Ошибка SW:', err));
+    }
+</script>
+</body>
+</html>

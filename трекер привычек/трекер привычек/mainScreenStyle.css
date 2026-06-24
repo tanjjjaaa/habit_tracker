@@ -1,0 +1,263 @@
+.main-container {
+    width: 100%;
+    height: 100%; /* Занимает всю высоту экрана */
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    padding: 10px 15px 90px 15px !important; /* 90px снизу — это критически важный отступ, чтобы цели не перекрывались кнопкой! */
+    overflow-y: auto; /* Позволяет крутить только список целей внутри экрана */
+}
+
+.calendar-section {
+    width: 100%;
+    background-color: #ffffff;
+    border: 3px solid #63dbce;
+    border-radius: 12px;
+    padding: 10px;
+    margin-bottom: 15px;
+}
+
+.month-switcher {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.month-switcher .month-title {
+    font-size: 16px;
+    font-weight: bold;
+    color: #43b2a6;
+    text-align: center;
+}
+
+.nav-arrow {
+    background-color: #c9fbf3;
+    border: 2px solid #63dbce;
+    border-radius: 6px;
+    width: 28px;
+    height: 28px;
+    font-size: 12px;
+    color: #43b2a6;
+    cursor: pointer;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 3px;
+    text-align: center;
+}
+
+.weekday-label {
+    font-size: 10px;
+    font-weight: bold;
+    color: #a0a0a0;
+    text-transform: uppercase;
+}
+
+.calendar-days-container {
+    display: contents;
+}
+
+.calendar-day-cell {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    color: #333333;
+    cursor: pointer;
+    position: relative;
+    border-radius: 50%;
+}
+
+.calendar-day-cell.selected-day {
+    border: 2px solid #63dbce;
+    font-weight: bold;
+}
+
+.calendar-day-cell.neighbor-month-day {
+    color: #cccccc;
+}
+
+.day-habit-indicator {
+    position: absolute;
+    bottom: 2px;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+}
+
+/* Цели и карточки привычек */
+.goals-section {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.section-badge {
+    background-color: #c9fbf3;
+    border: 2px solid #63dbce;
+    border-radius: 8px;
+    padding: 3px 10px;
+    font-size: 11px;
+    font-weight: bold;
+    color: #43b2a6;
+    align-self: flex-start;
+    margin-bottom: 10px;
+}
+
+.habits-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+}
+
+.habit-item {
+    background-color: #ffffff;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    padding: 8px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.habit-item.completed {
+    border-color: #63dbce;
+}
+
+.habit-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.habit-checkbox {
+    width: 18px;
+    height: 18px;
+    border: 2px solid #e0e0e0;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.habit-checkbox.checked {
+    background-size: cover;
+}
+
+.habit-text {
+    font-size: 13px;
+    color: #333333;
+}
+
+.habit-item.completed .habit-text {
+    text-decoration: line-through;
+    color: #a0a0a0;
+}
+
+.reminder-link {
+    font-size: 10px;
+    color: #b0b0b0;
+    text-decoration: underline;
+}
+
+.divider-line {
+    width: 100%;
+    border-top: 2px dashed #63dbce;
+    margin: 10px 0;
+}
+
+/* Плавающая кнопка добавления */
+.add-habit-btn {
+    position: absolute !important; /* Привязываем строго к границам дисплея телефона */
+    bottom: 20px !important;       /* Опускаем в самый низ */
+    right: 20px !important;        /* Сдвигаем в самый правый угол */
+    width: 54px !important;
+    height: 54px !important;
+    background-color: #c9fbf3;
+    border: 3px solid #63dbce;
+    font-size: 32px;
+    color: #43b2a6;
+    cursor: pointer;
+    display: none; /* Контролируется через JavaScript (navigation.js) */
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* Красивая тень, чтобы кнопка «парила» */
+    z-index: 99 !important; /* Гарантирует, что кнопка будет поверх списков, но под модальным окном */
+    border-radius: 50%;
+    user-select: none;
+    transition: transform 0.1s ease;
+}
+
+/* Эффект при нажатии на кнопку */
+.add-habit-btn:active {
+    transform: scale(0.92);
+}
+
+/* Поля модалки */
+.modal-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.modal-group {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+.modal-group label {
+    font-size: 11px;
+    color: #757575;
+}
+.modal-input {
+    width: 100%;
+    padding: 6px;
+    border: 2px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 12px;
+}
+.days-checkboxes {
+    display: none;
+}
+.days-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+.days-row label {
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+.color-palette {
+    display: flex;
+    gap: 8px;
+}
+.color-option {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid transparent;
+}
+.color-option input { display: none; }
+.color-option:has(input:checked) { border-color: #333333; }
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 5px;
+}
+.cancel-btn, .save-btn {
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+}
+.cancel-btn { background: #fff; border: 2px solid #e0e0e0; color: #757575; }
+.save-btn { background: #c9fbf3; border: 2px solid #63dbce; color: #43b2a6; }

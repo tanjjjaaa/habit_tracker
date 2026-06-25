@@ -1,5 +1,5 @@
 // ===== URL для связи с бекендом =====
-const API_URL = 'https://habit-tracker-backend-it43.onrender.com/api';
+const API_URL = 'https://63e5ebe1-0ee9-4762-a0cb-9cb2fa454c06.tunnel4.com/api';
 // ====================================
 
 // Константы месяцев на русском
@@ -10,7 +10,16 @@ let currentDate = new Date();
 let selectedDate = new Date();
 let habits = JSON.parse(localStorage.getItem('user_habits')) || [];
 
+// ===== ИНИЦИАЛИЗАЦИЯ =====
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('=== main.js загружен ===');
+    initCalendar();
+    renderHabits();
+    setupModalEvents();
 
+    document.getElementById('prevMonthBtn').addEventListener('click', () => changeMonth(-1));
+    document.getElementById('nextMonthBtn').addEventListener('click', () => changeMonth(1));
+});
 
 // ===== КАЛЕНДАРЬ =====
 function initCalendar() {
@@ -162,59 +171,24 @@ function setupModalEvents() {
 }
 
 // ===== ЗАГРУЗКА ПРИВЫЧЕК С СЕРВЕРА =====
-// function loadHabitsFromAPI() {
-//     const userId = localStorage.getItem('userId');
-//     if (!userId) return;
-
-//     fetch(`${API_URL}/habits/user/${userId}`)
-//         .then(response => {
-//             if (!response.ok) throw new Error('Ошибка загрузки');
-//             return response.json();
-//         })
-//         .then(data => {
-//             habits = data.map(habit => ({
-//                 id: habit.id.toString(),
-//                 name: habit.title,
-//                 frequency: habit.frequencyType === 'daily' ? 'everyday' : 'specific',
-//                 days: habit.frequencyDays || [],
-//                 color: habit.color || '#5cc1e0',
-//                 completedDates: []
-//             }));
-//             localStorage.setItem('user_habits', JSON.stringify(habits));
-//             renderHabits();
-//         })
-//         .catch(error => {
-//             console.error('Ошибка загрузки привычек:', error);
-//         });
-// }
-
 function loadHabitsFromAPI() {
     const userId = localStorage.getItem('userId');
     if (!userId) return;
 
     fetch(`${API_URL}/habits/user/${userId}`)
         .then(response => {
-            if (!response.ok) throw new Error('Ошибка загрузки привычек');
+            if (!response.ok) throw new Error('Ошибка загрузки');
             return response.json();
         })
         .then(data => {
-            habits = data.map(habit => {
-                // ИЗВЛЕКАЕМ ДАТЫ ВЫПОЛНЕНИЯ ИЗ habitLogs
-                const completedDates = (habit.habitLogs || []).map(log => {
-                    const date = new Date(log.completedAt);
-                    return date.toISOString().split('T')[0]; // Формат: YYYY-MM-DD
-                });
-
-                return {
-                    id: habit.id.toString(),
-                    name: habit.title,
-                    frequency: habit.frequencyType === 'daily' ? 'everyday' : 'specific',
-                    days: habit.frequencyDays || [],
-                    color: habit.color || '#5cc1e0',
-                    completedDates: completedDates // ← ТЕПЕРЬ ЗДЕСЬ РЕАЛЬНЫЕ ДАТЫ!
-                };
-            });
-
+            habits = data.map(habit => ({
+                id: habit.id.toString(),
+                name: habit.title,
+                frequency: habit.frequencyType === 'daily' ? 'everyday' : 'specific',
+                days: habit.frequencyDays || [],
+                color: habit.color || '#5cc1e0',
+                completedDates: []
+            }));
             localStorage.setItem('user_habits', JSON.stringify(habits));
             renderHabits();
         })
@@ -278,70 +252,19 @@ function renderHabits() {
     divider.style.display = hasCompleted ? 'block' : 'none';
 }
 
-// function toggleHabitStatus(habitId, dateStr) {
-//     const habit = habits.find(h => h.id === habitId);
-//     if (!habit) return;
-
-//     const index = habit.completedDates.indexOf(dateStr);
-//     if (index > -1) {
-//         habit.completedDates.splice(index, 1);
-//     } else {
-//         habit.completedDates.push(dateStr);
-//     }
-
-//     saveToDB();
-//     renderHabits();
-// }
-
 function toggleHabitStatus(habitId, dateStr) {
-    // Ищем привычку в локальном списке, чтобы знать её название для сообщения
     const habit = habits.find(h => h.id === habitId);
     if (!habit) return;
 
-    // Проверяем, выполнена ли она уже сегодня
-    const isDoneToday = habit.completedDates.includes(dateStr);
-
-    // Если уже выполнена, отменяем (удаляем) отметку
-    if (isDoneToday) {
-        // ВАЖНО: ВАШ БЕКЕНД ДОЛЖЕН УМЕТЬ УДАЛЯТЬ ОТМЕТКИ.
-        // Если нет, можно временно просто обновить локальное состояние,
-        // но для полной синхронизации лучше реализовать DELETE эндпоинт.
-        // Пока просто убираем из локального списка и сохраняем.
-        habit.completedDates = habit.completedDates.filter(d => d !== dateStr);
-        saveToDB();
-        renderHabits();
-        alert('Отметка снята! (пока только локально)');
-        return;
+    const index = habit.completedDates.indexOf(dateStr);
+    if (index > -1) {
+        habit.completedDates.splice(index, 1);
+    } else {
+        habit.completedDates.push(dateStr);
     }
 
-    // Если не выполнена — отправляем запрос на сервер
-    console.log(`Отправка отметки для привычки ${habitId} на дату ${dateStr}`);
-
-    fetch(`${API_URL}/habits/${habitId}/complete`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        // Можно отправить дату в теле запроса, если ваш бекенд её ожидает
-        // body: JSON.stringify({ completedAt: dateStr })
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Ошибка сервера при сохранении отметки');
-        }
-        return response.json();
-    })
-    .then(data => {
-        console.log('Отметка сохранена на сервере:', data);
-        // После успешного сохранения на сервере, обновляем локальное состояние
-        habit.completedDates.push(dateStr);
-        saveToDB();
-        renderHabits();
-        // Можно также перезагрузить данные с сервера для полной синхронизации
-        // loadHabitsFromAPI();
-    })
-    .catch(error => {
-        console.error('Ошибка:', error);
-        alert('Не удалось сохранить отметку. Проверьте подключение к серверу.');
-    });
+    saveToDB();
+    renderHabits();
 }
 
 // ===== ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК =====
@@ -366,44 +289,20 @@ function switchMode(mode) {
     }
 }
 
-// ===== ИНИЦИАЛИЗАЦИЯ =====
+// ===== ОБРАБОТКА ФОРМЫ АВТОРИЗАЦИИ =====
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('=== main.js загружен ===');
-    
-    // 1. Проверяем, есть ли сохранённый пользователь
-    const userId = localStorage.getItem('userId');
-    
-    if (userId) {
-    console.log('Пользователь уже авторизован:', userId);
-    loadHabitsFromAPI();
-    setupModalEvents();   // ← ДОБАВЛЕНО!
-    if (typeof switchScreen === 'function') {
-        switchScreen(1);
-    } else {
-        const authContainer = document.getElementById('authContainer');
-        const bossPage = document.getElementById('bossPage');
-        if (authContainer) authContainer.style.display = 'none';
-        if (bossPage) bossPage.style.display = 'flex';
-    }
-} else {
-    initCalendar();
-    renderHabits();
-    setupModalEvents();
-}
-
-    // 2. Кнопки переключения месяцев
-    const prevBtn = document.getElementById('prevMonthBtn');
-    const nextBtn = document.getElementById('nextMonthBtn');
-    if (prevBtn) prevBtn.addEventListener('click', () => changeMonth(-1));
-    if (nextBtn) nextBtn.addEventListener('click', () => changeMonth(1));
-
-    // 3. Обработчик формы авторизации (ОДИН РАЗ!)
     const authForm = document.getElementById('authForm');
     if (!authForm) return;
 
     authForm.addEventListener('submit', function(event) {
         event.preventDefault();
-        console.log('=== ФОРМА ОТПРАВЛЕНА ===');
+
+        authForm.addEventListener('submit', function(event) {
+    event.preventDefault();
+    console.log('=== ФОРМА ОТПРАВЛЕНА ===');
+    console.log('Режим:', document.getElementById('authContainer').classList.contains('register-mode') ? 'регистрация' : 'вход');
+    // ... остальной код
+});
 
         const loginValue = document.getElementById('login').value.trim();
         const passwordValue = document.getElementById('password').value;
@@ -412,7 +311,6 @@ document.addEventListener('DOMContentLoaded', () => {
         
         if (!container) return;
         const isRegisterMode = container.classList.contains('register-mode');
-        console.log('Режим:', isRegisterMode ? 'регистрация' : 'вход');
 
         if (!loginValue || !passwordValue) {
             alert('Пожалуйста, заполните все обязательные поля!');
@@ -420,7 +318,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (isRegisterMode) {
-            // === РЕГИСТРАЦИЯ ===
             const nameValue = document.getElementById('name').value.trim();
             if (!nameValue) {
                 alert('Пожалуйста, введите ваше имя!');
@@ -459,10 +356,10 @@ document.addEventListener('DOMContentLoaded', () => {
             })
             .catch(error => {
                 console.error('Ошибка:', error);
-                alert('Не удалось зарегистрироваться');
+                alert('Не удалось зарегистрироваться.');
             });
+
         } else {
-            // === ВХОД ===
             console.log('=== ВХОД ===');
             console.log('Логин:', loginValue);
 
@@ -476,7 +373,6 @@ document.addEventListener('DOMContentLoaded', () => {
             })
             .then(response => response.json())
             .then(data => {
-                console.log('Ответ:', data);
                 if (data.success) {
                     localStorage.setItem('userId', data.userId);
                     localStorage.setItem('username', data.username);
@@ -485,9 +381,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (typeof switchScreen === 'function') {
                         switchScreen(1);
                     } else {
-                        const authContainer = document.getElementById('authContainer');
+                        const container = document.getElementById('authContainer');
                         const bossPage = document.getElementById('bossPage');
-                        if (authContainer) authContainer.style.display = 'none';
+                        if (container) container.style.display = 'none';
                         if (bossPage) bossPage.style.display = 'flex';
                     }
                 } else {
@@ -496,8 +392,22 @@ document.addEventListener('DOMContentLoaded', () => {
             })
             .catch(error => {
                 console.error('Ошибка:', error);
-                alert('Не удалось войти');
+                alert('Не удалось войти.');
             });
         }
     });
+
+    const goToMainBtn = document.getElementById('goToMainBtn');
+    if (goToMainBtn) {
+        goToMainBtn.addEventListener('click', () => {
+            if (typeof switchScreen === 'function') {
+                switchScreen(2);
+            } else {
+                const bossPage = document.getElementById('bossPage');
+                const mainCont = document.querySelector('.main-container');
+                if (bossPage) bossPage.style.display = 'none';
+                if (mainCont) mainCont.style.display = 'flex';
+            }
+        });
+    }
 });

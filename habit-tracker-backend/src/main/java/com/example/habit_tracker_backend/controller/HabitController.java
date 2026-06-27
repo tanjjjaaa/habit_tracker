@@ -36,7 +36,15 @@ public class HabitController {
     public ResponseEntity<List<Habit>> getHabitsByUser(@PathVariable Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
-        return ResponseEntity.ok(habitRepository.findByUser(user));
+
+        // Загружаем привычки с логами
+        List<Habit> habits = habitRepository.findByUser(user);
+        habits.forEach(habit -> {
+            // Принудительно загружаем habitLogs, чтобы они попали в JSON
+            habit.getHabitLogs().size();
+        });
+
+        return ResponseEntity.ok(habits);
     }
 
     @PostMapping

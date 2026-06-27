@@ -2,6 +2,7 @@ package com.example.habit_tracker_backend.entity;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "habit_logs", schema = "public")
@@ -13,6 +14,7 @@ public class HabitLog {
 
     @ManyToOne
     @JoinColumn(name = "habit_id", nullable = false)
+    @JsonIgnore
     private Habit habit;
 
     @Column(name = "completed_at")

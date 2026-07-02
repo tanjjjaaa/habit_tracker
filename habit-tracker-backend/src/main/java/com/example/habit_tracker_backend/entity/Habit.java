@@ -2,7 +2,9 @@ package com.example.habit_tracker_backend.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Entity
@@ -18,6 +20,9 @@ public class Habit {
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    @Column(name = "reminder_time")
+    private LocalTime reminderTime;
 
     @Column(nullable = false, length = 200)
     private String title;

@@ -3,10 +3,12 @@ package com.example.habit_tracker_backend;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @SpringBootApplication
+@EnableScheduling
 public class HabitTrackerBackendApplication {
 
 	public static void main(String[] args) {
@@ -23,7 +25,6 @@ public class HabitTrackerBackendApplication {
 								"http://localhost:3000",
 								"http://localhost:5500",
 								"https://glittery-marigold-26034a.netlify.app"
-								//"https://beamish-nougat-01aa70.netlify.app"
 						)
 						.allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
 						.allowedHeaders("*")

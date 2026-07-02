@@ -1,8 +1,10 @@
 package com.example.habit_tracker_backend.entity;
 
-import jakarta.persistence.*;
-import java.time.LocalDateTime;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "habit_logs", schema = "public")
@@ -17,22 +19,43 @@ public class HabitLog {
     @JsonIgnore
     private Habit habit;
 
-    @Column(name = "completed_at")
-    private LocalDateTime completedAt;
+    @Column(name = "completed_at", nullable = false)
+    private LocalDate completedAt;
 
     @Column(columnDefinition = "TEXT")
     private String note;
 
-    // Геттеры и сеттеры
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    // ===== Геттеры и сеттеры =====
 
-    public Habit getHabit() { return habit; }
-    public void setHabit(Habit habit) { this.habit = habit; }
+    public Long getId() {
+        return id;
+    }
 
-    public LocalDateTime getCompletedAt() { return completedAt; }
-    public void setCompletedAt(LocalDateTime completedAt) { this.completedAt = completedAt; }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-    public String getNote() { return note; }
-    public void setNote(String note) { this.note = note; }
+    public Habit getHabit() {
+        return habit;
+    }
+
+    public void setHabit(Habit habit) {
+        this.habit = habit;
+    }
+
+    public LocalDate getCompletedAt() {
+        return completedAt;
+    }
+
+    public void setCompletedAt(LocalDate completedAt) {
+        this.completedAt = completedAt;
+    }
+
+    public String getNote() {
+        return note;
+    }
+
+    public void setNote(String note) {
+        this.note = note;
+    }
 }
